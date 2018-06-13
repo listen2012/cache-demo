@@ -62,7 +62,7 @@ public class CacherOperationSource extends AbstractFallbackCacheOperationSource 
 	protected Collection<CacheOperation> findCacheOperations(final Method method) {
 		return determineCacherOperations(new CacherOperationProvider() {
 			@Override
-			public Collection<CacherOperation> getCacherOperations(
+			public Collection<CacheOperation> getCacherOperations(
 					CacherAnnotationParser parser) {
 				// TODO Auto-generated method stub
 				return parser.parseCacheAnnotations(method);
@@ -79,7 +79,7 @@ public class CacherOperationSource extends AbstractFallbackCacheOperationSource 
 	protected Collection<CacheOperation> determineCacherOperations(CacherOperationProvider provider) {
 		Collection<CacheOperation> ops = null;
 		for (CacherAnnotationParser annotationParser : this.cacherParsers) {
-			Collection<CacherOperation> annOps = provider.getCacherOperations(annotationParser);
+			Collection<CacheOperation> annOps = provider.getCacherOperations(annotationParser);
 			if (annOps != null) {
 				if (ops == null) {
 					ops = new ArrayList<CacheOperation>();
@@ -101,7 +101,7 @@ public class CacherOperationSource extends AbstractFallbackCacheOperationSource 
 		 * @param parser the parser to use
 		 * @return the cache operations, or {@code null} if none found
 		 */
-		Collection<CacherOperation> getCacherOperations(CacherAnnotationParser parser);
+		Collection<CacheOperation> getCacherOperations(CacherAnnotationParser parser);
 	}
 
 

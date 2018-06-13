@@ -3,7 +3,6 @@ package com.listen.cache.config;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.cache.annotation.AbstractCachingConfiguration;
 import org.springframework.cache.interceptor.BeanFactoryCacheOperationSourceAdvisor;
-import org.springframework.cache.interceptor.CacheInterceptor;
 import org.springframework.cache.interceptor.CacheOperationSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +12,8 @@ import org.springframework.core.type.AnnotationMetadata;
 
 import com.listen.cache.annotation.EnableCacher;
 import com.listen.cache.annotation.component.CacherOperationSource;
+import com.listen.cache.aop.CacherInterceptor;
+import com.listen.cache.aop.CopyOfCacherInterceptor;
 
 @Configuration
 public class CacherConfiguration extends AbstractCachingConfiguration{
@@ -34,7 +35,7 @@ public class CacherConfiguration extends AbstractCachingConfiguration{
 		BeanFactoryCacheOperationSourceAdvisor advisor =
 				new BeanFactoryCacheOperationSourceAdvisor();
 		advisor.setCacheOperationSource(cacherOperationSource());
-		advisor.setAdvice(cacheInterceptor());
+		advisor.setAdvice(new CacherInterceptor());
 //		advisor.setOrder(this.enableCaching.<Integer>getNumber("order"));
 		return advisor;
 	}
@@ -47,8 +48,8 @@ public class CacherConfiguration extends AbstractCachingConfiguration{
 
 	@Bean
 	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-	public CacheInterceptor cacheInterceptor() {
-		CacheInterceptor interceptor = new CacheInterceptor();
+	public CacherInterceptor cacheInterceptor() {
+		CacherInterceptor interceptor = new CacherInterceptor();
 		interceptor.setCacheOperationSources(cacherOperationSource());
 		if (this.cacheResolver != null) {
 			interceptor.setCacheResolver(this.cacheResolver);

@@ -22,9 +22,12 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.springframework.cache.interceptor.CacheOperation;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
+import com.listen.cache.annotation.CacheRemover;
 import com.listen.cache.annotation.Cacher;
+import com.listen.cache.annotation.cacheroperation.CacheRemoverOperation;
 import com.listen.cache.annotation.cacheroperation.CacherOperation;
 
 @SuppressWarnings("serial")
@@ -35,7 +38,7 @@ public class CacherAnnotationParser implements Serializable {
 		return null;
 	}
 
-	public Collection<CacherOperation> parseCacheAnnotations(Method method) {
+	public Collection<CacheOperation> parseCacheAnnotations(Method method) {
 		// TODO Auto-generated method stub
 		return parseCacherAnnotations(method);
 	}
@@ -47,15 +50,23 @@ public class CacherAnnotationParser implements Serializable {
 	// return co;
 	// }
 
-	protected Collection<CacherOperation> parseCacherAnnotations(
+	protected Collection<CacheOperation> parseCacherAnnotations(
 			AnnotatedElement ae) {
-		Collection<CacherOperation> ops = new ArrayList<CacherOperation>(1);
+		Collection<CacheOperation> ops = new ArrayList<CacheOperation>(1);
 
 		Collection<Cacher> cachers = AnnotatedElementUtils
 				.getAllMergedAnnotations(ae, Cacher.class);
 		if (!cachers.isEmpty()) {
 			for (Cacher cacher : cachers) {
 				ops.add(parseCacherAnnotation(ae, cacher));
+			}
+		}
+
+		Collection<CacheRemover> cacheRemovers = AnnotatedElementUtils
+				.getAllMergedAnnotations(ae, CacheRemover.class);
+		if (!cacheRemovers.isEmpty()) {
+			for (CacheRemover cacheRemover : cacheRemovers) {
+				ops.add(parseCacheRemoverAnnotation(ae, cacheRemover));
 			}
 		}
 		return ops;
@@ -65,6 +76,13 @@ public class CacherAnnotationParser implements Serializable {
 		CacherOperation.Builder builder = new CacherOperation.Builder();
 		builder.setKey(cacher.key());
 		CacherOperation op = new CacherOperation(builder);
+		return op;
+	}
+
+	CacheRemoverOperation parseCacheRemoverAnnotation(AnnotatedElement ae, CacheRemover cacheRemover) {
+		CacheRemoverOperation.Builder builder = new CacheRemoverOperation.Builder();
+		builder.setKey(cacheRemover.key());
+		CacheRemoverOperation op = new CacheRemoverOperation(builder);
 		return op;
 	}
 

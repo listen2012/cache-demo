@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.listen.SpringBootDemo;
-import com.listen.cache.map.CacheMapHandler;
+import com.listen.cache.map.ConcurrentMapCache;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = SpringBootDemo.class)
@@ -17,8 +17,8 @@ public class CacheTest {
 	@Autowired
 	private CachePutTest putTest;
 
-	@Autowired
-	private CacheMapHandler handler;
+//	@Autowired
+//	private CacheMapHandler handler;
 
 	@Test
 	public void test() {
