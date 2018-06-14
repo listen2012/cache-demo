@@ -3,18 +3,16 @@ package com.listen.cache.aop;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.cache.Cache;
 import org.springframework.cache.interceptor.CacheAspectSupport;
 import org.springframework.cache.interceptor.CacheOperation;
 import org.springframework.cache.interceptor.CacheOperationInvoker;
 
-import com.listen.cache.annotation.Cacher;
 import com.listen.cache.annotation.cacheroperation.CacherOperation;
 import com.listen.cache.annotation.cacheroperation.CacherOperationContext;
-import com.listen.cache.map.ConcurrentMapCache;
 
 @SuppressWarnings("serial")
 public class CacherInterceptor extends CacheAspectSupport implements
@@ -51,25 +49,35 @@ public class CacherInterceptor extends CacheAspectSupport implements
 		Collection<CacheOperation> ops = getCacheOperationSource()
 				.getCacheOperations(method, target.getClass());
 
-		CacherOperationContext context = new CacherOperationContext();
-		//assemble opation, cachemanager
-		
-		for (CacheOperation op : ops) {
-			opMap.put(op.getClass(), op);	
-		}
-		
+		// assemble operation, cachemanager
+		CacherOperationContext context = new CacherOperationContext(ops);
+		Object key = generateKey(CacherOperation.class, context);
 		// cachehit
-		CacheOperation cacherOp = opMap.get(Cacher.class);
-		String cacherKey = cacherOp.getKey();
-		Object value = cacheMap.get(key);
-		if (value != null) {
+		Object value = null;
+//		if (tryTofindInCache(key, context)) {
+			value = findInCache(key, context);
+			if(value != null)
 			return value;
-		}
+//		}
 		value = invoker.proceed();
-		cacheMap.put(key, value);
+		// update cache
+		getCacheManager();
 		return value;
-
 	}
-	
-	private final LinkedHashMap<Class, CacheOperation> opMap = new LinkedHashMap<Class, CacheOperation>();
+
+	private Object generateKey(Class<? extends CacheOperation> clazz,
+			CacherOperationContext context) {
+		CacheOperation cacherop = context.get(clazz);
+		return cacherop.getKey();
+	}
+
+	private boolean tryTofindInCache(Object key, CacherOperationContext context) {
+		return context.getCache().lookup(key);
+	}
+
+	private Object findInCache(Object key, CacherOperationContext context) {
+		Object value = context.getCache().get(key);
+		return value;
+	}
+
 }

@@ -16,13 +16,44 @@
 
 package com.listen.cache.annotation.cacheroperation;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
-import org.springframework.cache.Cache;
+import org.springframework.cache.interceptor.CacheOperation;
+
+import com.listen.cache.map.AbstractBasicCache;
+import com.listen.cache.map.ConcurrentMapCache;
 
 public class CacherOperationContext {
-	private LinkedHashMap opMap;
-	
-	private Cache cache;
+	private LinkedHashMap<Class<? extends CacheOperation>, CacheOperation> opMap;
 
+	private AbstractBasicCache cache;
+
+	public CacherOperationContext(Collection<CacheOperation> ops) {
+		this.opMap = new LinkedHashMap<Class<? extends CacheOperation>, CacheOperation>(
+				32);
+		this.cache = generateCache();
+		for (CacheOperation op : ops) {
+			add(op.getClass(), op);
+		}
+	}
+
+	public void add(Class<? extends CacheOperation> clazz,
+			CacheOperation context) {
+		this.opMap.put(clazz, context);
+	}
+
+	public CacheOperation get(Class<? extends CacheOperation> clazz) {
+		return this.opMap.get(clazz);
+	}
+
+	public AbstractBasicCache getCache() {
+		return this.cache;
+	}
+
+	private AbstractBasicCache generateCache() {
+		return new ConcurrentMapCache(
+				new ConcurrentHashMap<Object, Object>(256));
+	}
 }
