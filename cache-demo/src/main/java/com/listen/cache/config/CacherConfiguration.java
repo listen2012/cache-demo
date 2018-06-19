@@ -13,6 +13,7 @@ import org.springframework.core.type.AnnotationMetadata;
 import com.listen.cache.annotation.EnableCacher;
 import com.listen.cache.annotation.component.CacherOperationSource;
 import com.listen.cache.aop.CacherInterceptor;
+import com.listen.cache.aop.CacherResolver;
 
 @Configuration
 public class CacherConfiguration extends AbstractCachingConfiguration{
@@ -51,13 +52,13 @@ public class CacherConfiguration extends AbstractCachingConfiguration{
 		CacherInterceptor interceptor = new CacherInterceptor();
 		interceptor.setCacheOperationSources(cacherOperationSource());
 		if (this.cacheResolver != null) {
-			interceptor.setCacheResolver(this.cacheResolver);
+			interceptor.setCacherResolver((CacherResolver) this.cacheResolver);
 		}
 		else if (this.cacheManager != null) {
 			interceptor.setCacheManager(this.cacheManager);
 		}
 		if (this.keyGenerator != null) {
-			interceptor.setKeyGenerator(this.keyGenerator);
+//			interceptor.setKeyGenerator(this.keyGenerator);
 		}
 		if (this.errorHandler != null) {
 			interceptor.setErrorHandler(this.errorHandler);
