@@ -28,8 +28,6 @@ public class CacherInterceptor extends CacherAbstractSupport implements
 		// };
 
 		try {
-			System.out
-					.println("-------- enter CacherInterceptor -------------");
 			return execute(invocation, invocation.getThis(), method,
 					invocation.getArguments());
 		} catch (CacheOperationInvoker.ThrowableWrapper th) {

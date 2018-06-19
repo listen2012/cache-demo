@@ -1,4 +1,4 @@
-package com.listen.cache;
+package com.listen.cacher;
 
 import org.junit.After;
 import org.junit.Test;
@@ -11,18 +11,15 @@ import com.listen.SpringBootDemo;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = SpringBootDemo.class)
-public class CacheTest {
+public class CacherTest {
 
 	@Autowired
-	private CachePutTest putTest;
-
-//	@Autowired
-//	private CacheMapHandler handler;
+	private CacherPutTest putTest;
 
 	@Test
 	public void test() {
 		try {
-			String value = putTest.put("put a string", "key_test");
+			String value = putTest.put("put a string", "key_test_1");
 			System.out.println("test get value : ------ " + value.toString());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -39,7 +36,7 @@ public class CacheTest {
 //		System.out.println("key : ------ " + key);
 //		System.out.println("cacheManager : ------ " + manager);
 
-		String value = (String)putTest.put("333", "key_test");
+		String value = (String)putTest.put("get a string", "key_test_2");
 		System.out.println("check get value : ------ " + value.toString());
 	}
 }

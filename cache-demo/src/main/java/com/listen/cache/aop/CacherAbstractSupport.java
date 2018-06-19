@@ -17,8 +17,10 @@
 package com.listen.cache.aop;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.beans.BeansException;
@@ -26,6 +28,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.SmartInitializingSingleton;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.interceptor.AbstractCacheInvoker;
 import org.springframework.cache.interceptor.CacheInterceptor;
@@ -36,9 +39,12 @@ import org.springframework.cache.interceptor.CacheResolver;
 import org.springframework.cache.interceptor.CompositeCacheOperationSource;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.cache.interceptor.SimpleKeyGenerator;
+import org.springframework.context.expression.AnnotatedElementKey;
+import org.springframework.expression.EvaluationContext;
 import org.springframework.util.Assert;
 
 import com.listen.cache.annotation.cacheroperation.CacherOperation;
+import com.listen.cache.annotation.expression.CacherOperationExpressionEvaluator;
 import com.listen.cache.map.AbstractBasicCache;
 
 /**
@@ -82,6 +88,8 @@ public abstract class CacherAbstractSupport extends AbstractCacheInvoker
 
 	private BeanFactory beanFactory;
 
+	private final CacherOperationExpressionEvaluator evaluator = new CacherOperationExpressionEvaluator();
+
 	public CacheOperationSource getCacheOperationSource() {
 		return this.cacheOperationSource;
 	}
@@ -92,8 +100,11 @@ public abstract class CacherAbstractSupport extends AbstractCacheInvoker
 				.getCacheOperations(method, target.getClass());
 
 		// assemble operation, cachemanager
-		CacherOperationContext context = new CacherOperationContext(ops);
-		Object key = generateKey(CacherOperation.class, context);
+		CacherOperationContext context = new CacherOperationContext(ops, target, target.getClass(),  method, args);
+		Object key = context.generateKey(CacherOperation.class, context);
+		
+		System.out.println("generateKey... " + key);
+		
 		// cachehit
 		Object value = null;
 		if (tryTofindInCache(key, context)) {
@@ -105,12 +116,6 @@ public abstract class CacherAbstractSupport extends AbstractCacheInvoker
 		// update cache
 		context.getCache().put(key, value);
 		return value;
-	}
-
-	private Object generateKey(Class<? extends CacheOperation> clazz,
-			CacherOperationContext context) {
-		CacheOperation cacherop = context.get(clazz);
-		return cacherop.getKey();
 	}
 
 	private boolean tryTofindInCache(Object key, CacherOperationContext context) {
@@ -173,14 +178,33 @@ public abstract class CacherAbstractSupport extends AbstractCacheInvoker
 		private LinkedHashMap<Class<? extends CacheOperation>, CacheOperation> opMap;
 
 		private AbstractBasicCache cache;
+		
+		private Method method;
+		
+		private Object target;
+		
+		private Class<?> targetClass;
+		
+		private Object[] args;
+		
+		private final AnnotatedElementKey methodCacheKey;
+		
+		private List<AbstractBasicCache> caches = new ArrayList<AbstractBasicCache>();
 
-		public CacherOperationContext(Collection<CacheOperation> ops) {
+		public CacherOperationContext(Collection<CacheOperation> ops, Object target, Class<?> targetClass, Method method, Object[] args) {
 			this.opMap = new LinkedHashMap<Class<? extends CacheOperation>, CacheOperation>(
 					32);
 			this.cache = CacherAbstractSupport.this.getCache(this, cacherResolver);
+			caches.add(this.cache);
 			for (CacheOperation op : ops) {
 				add(op.getClass(), op);
 			}
+			
+			this.method = method;
+			this.target = target;
+			this.targetClass = targetClass;
+			this.args = args;
+			this.methodCacheKey = new AnnotatedElementKey(this.method, this.targetClass);
 		}
 
 		public void add(Class<? extends CacheOperation> clazz,
@@ -194,6 +218,19 @@ public abstract class CacherAbstractSupport extends AbstractCacheInvoker
 
 		public AbstractBasicCache getCache() {
 			return this.cache;
+		}
+		
+		private Object generateKey(Class<? extends CacheOperation> clazz,
+				CacherOperationContext context) {
+			CacheOperation cacherop = context.get(clazz);
+			EvaluationContext evaluationContext = createEvaluationContext(CacherOperationExpressionEvaluator.NO_RESULT);
+			return evaluator.key(cacherop.getKey(), this.methodCacheKey, evaluationContext);
+//			return cacherop.getKey();
+		}
+		
+		private EvaluationContext createEvaluationContext(Object result) {
+			return evaluator.createEvaluationContext(caches, this.method, this.args,
+					this.target, this.targetClass, result, beanFactory);
 		}
 
 		@Override
