@@ -23,6 +23,8 @@ import java.util.Set;
 import org.springframework.cache.interceptor.BasicOperation;
 import org.springframework.util.Assert;
 
+import com.listen.cache.aop.CacherAbstractSupport.CacherOperationContext;
+
 /**
  * Base class for cache operations.
  *
@@ -48,7 +50,8 @@ public abstract class AbstractCacheOperation implements BasicOperation {
 	private final String condition;
 
 	private final String toString;
-
+	
+	private Object codedKey;
 
 	/**
 	 * @since 4.3
@@ -63,7 +66,6 @@ public abstract class AbstractCacheOperation implements BasicOperation {
 		this.condition = b.condition;
 		this.toString = b.getOperationDescription().toString();
 	}
-
 
 	public String getName() {
 		return this.name;
@@ -94,18 +96,20 @@ public abstract class AbstractCacheOperation implements BasicOperation {
 		return this.condition;
 	}
 
-
 	/**
 	 * This implementation compares the {@code toString()} results.
+	 * 
 	 * @see #toString()
 	 */
 	@Override
 	public boolean equals(Object other) {
-		return (other instanceof AbstractCacheOperation && toString().equals(other.toString()));
+		return (other instanceof AbstractCacheOperation && toString().equals(
+				other.toString()));
 	}
 
 	/**
 	 * This implementation returns {@code toString()}'s hash code.
+	 * 
 	 * @see #toString()
 	 */
 	@Override
@@ -115,25 +119,62 @@ public abstract class AbstractCacheOperation implements BasicOperation {
 
 	/**
 	 * Return an identifying description for this cache operation.
-	 * <p>Returned value is produced by calling {@link Builder#getOperationDescription()}
-	 * during object construction. This method is used in {@link #hashCode} and
-	 * {@link #equals}.
+	 * <p>
+	 * Returned value is produced by calling
+	 * {@link Builder#getOperationDescription()} during object construction.
+	 * This method is used in {@link #hashCode} and {@link #equals}.
+	 * 
 	 * @see Builder#getOperationDescription()
 	 */
 	@Override
 	public final String toString() {
 		return this.toString;
 	}
-	
-	public abstract Object operate(CacherOperationContext context);
-	
-	private boolean tryTofindInCache(Object key, CacherOperationContext context) {
-		return context.getCache().lookup(key);
+
+	public Object operate(CacherOperationContext context) throws Throwable {
+		Object value = null;
+
+		if (checkBeforeInvoke(context)) {
+			try {
+				value = context.getInvoker().proceed();
+				context.setValue(value);
+			} catch (Throwable e) {
+				e.printStackTrace();
+				throw new Throwable(e);
+			}
+		} else {
+			value = executeWithoutInvoke(context);
+		}
+		executeAfterInvoke(context);
+		return value;
 	}
 
-	private Object findInCache(Object key, CacherOperationContext context) {
-		Object value = context.getCache().get(key).get();
-		return value;
+	protected boolean checkBeforeInvoke(CacherOperationContext context) {
+		return true;
+	}
+
+	protected Object executeWithoutInvoke(CacherOperationContext context) {
+		return null;
+	}
+
+	protected void executeAfterInvoke(CacherOperationContext context) {}
+
+//	protected boolean tryTofindInCache(
+//			CacherOperationContext context) {
+//		return context.getCache().lookup(key);
+//	}
+//
+//	protected Object findInCache(Object key, CacherOperationContext context) {
+//		Object value = context.getCache().get(key).get();
+//		return value;
+//	}
+
+	public Object getCodedKey() {
+		return codedKey;
+	}
+
+	public void setCodedKey(Object codedKey) {
+		this.codedKey = codedKey;
 	}
 
 	/**
@@ -168,7 +209,8 @@ public abstract class AbstractCacheOperation implements BasicOperation {
 		public void setCacheNames(String... cacheNames) {
 			this.cacheNames = new LinkedHashSet<String>(cacheNames.length);
 			for (String cacheName : cacheNames) {
-				Assert.hasText(cacheName, "Cache name must be non-empty if specified");
+				Assert.hasText(cacheName,
+						"Cache name must be non-empty if specified");
 				this.cacheNames.add(cacheName);
 			}
 		}
@@ -220,7 +262,9 @@ public abstract class AbstractCacheOperation implements BasicOperation {
 
 		/**
 		 * Return an identifying description for this caching operation.
-		 * <p>Available to subclasses, for inclusion in their {@code toString()} result.
+		 * <p>
+		 * Available to subclasses, for inclusion in their {@code toString()}
+		 * result.
 		 */
 		protected StringBuilder getOperationDescription() {
 			StringBuilder result = new StringBuilder(getClass().getSimpleName());

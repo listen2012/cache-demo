@@ -16,6 +16,10 @@
 
 package com.listen.cache.annotation.cacheroperation;
 
+import org.springframework.cache.Cache;
+import org.springframework.cache.Cache.ValueWrapper;
+
+import com.listen.cache.aop.CacherAbstractSupport.CacherOperationContext;
 
 public class CacherOperation extends AbstractCacheOperation {
 
@@ -23,23 +27,48 @@ public class CacherOperation extends AbstractCacheOperation {
 		super(b);
 	}
 
-	
+	@Override
+	protected boolean checkBeforeInvoke(CacherOperationContext context) {
+		return tryTofindInCache(context);
+	}
+
+	@Override
+	protected Object executeWithoutInvoke(CacherOperationContext context) {
+		return findInCache(context);
+	}
+
+	@Override
+	protected void executeAfterInvoke(CacherOperationContext context) {
+		context.getCache().put(
+				context.getOperationByClass(CacherOperation.class)
+						.getCodedKey(), context.getValue());
+	}
+
+	protected Object findInCache(CacherOperationContext context) {
+		Object value = null;
+		Cache.ValueWrapper cachehit = context.getCache().get(
+				context.getOperationByClass(CacherOperation.class)
+						.getCodedKey());
+		if (cachehit != null) {
+			value = cachehit.get();
+		}
+		return value;
+	}
+
+	protected boolean tryTofindInCache(CacherOperationContext context) {
+		return !context.getCache().lookup(
+				context.getOperationByClass(CacherOperation.class)
+						.getCodedKey());
+	}
+
 	/**
 	 * @since 4.3
 	 */
 	public static class Builder extends AbstractCacheOperation.Builder {
-		
-		private String key;
-		
-		public void setKey(String key) {
-			this.key = key;
-		}
 
 		@Override
 		protected StringBuilder getOperationDescription() {
 			StringBuilder sb = super.getOperationDescription();
-			sb.append(" | key='");
-			sb.append(this.key);
 			return sb;
 		}
 
@@ -47,13 +76,6 @@ public class CacherOperation extends AbstractCacheOperation {
 		public CacherOperation build() {
 			return new CacherOperation(this);
 		}
-	}
-
-
-	@Override
-	public Object operate(CacherOperationContext context) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

@@ -58,10 +58,4 @@ public class CacheRemoverOperation extends AbstractCacheOperation {
 		}
 	}
 
-	@Override
-	public Object operate(CacherOperationContext context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

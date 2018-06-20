@@ -1,7 +1,6 @@
 package com.listen.temp;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,27 +9,22 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class TempTest {
 
+	public String except() throws Exception {
+		return "string";
+	}
 
 	@Test
 	public void homePage() throws Exception {
-		ArrayList<String> list = new ArrayList<String>();
-		list.add("a");
-		list.add("b");
-		Iterator it = list.iterator();
-		for(String i : list){
-			System.out.println("first ---- "+i);
-			if(i.equals("b")){
-				list.remove("b");
-			}
-		}
-		for(String i : list){
-			System.out.println("second ---- "+i);
-		}
-//		if(it.hasNext()){
-//			if("a".equals(it.next())){
-//				list.remove("a");
-//			}
-//		}
-			
+		LinkedHashMap<?, ?> map = new LinkedHashMap<>();
+		AbstractTempTest test = new DefaultTempTest(); 
+		map.forEach((k, v) -> {
+				try {
+					test.except();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		});
+
 	}
 }
