@@ -18,7 +18,7 @@ package com.listen.cache.annotation.cacheroperation;
 
 import org.springframework.cache.interceptor.CacheOperation;
 
-public class CacheRemoverOperation extends CacheOperation {
+public class CacheRemoverOperation extends AbstractCacheOperation {
 
 	private final String key;
 
@@ -36,7 +36,7 @@ public class CacheRemoverOperation extends CacheOperation {
 	/**
 	 * @since 4.3
 	 */
-	public static class Builder extends CacheOperation.Builder {
+	public static class Builder extends AbstractCacheOperation.Builder {
 		
 		private String key;
 		
@@ -56,6 +56,12 @@ public class CacheRemoverOperation extends CacheOperation {
 		public CacheRemoverOperation build() {
 			return new CacheRemoverOperation(this);
 		}
+	}
+
+	@Override
+	public Object operate(CacherOperationContext context) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

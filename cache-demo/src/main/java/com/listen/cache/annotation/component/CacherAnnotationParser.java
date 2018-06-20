@@ -27,6 +27,7 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import com.listen.cache.annotation.CacheRemover;
 import com.listen.cache.annotation.Cacher;
+import com.listen.cache.annotation.cacheroperation.AbstractCacheOperation;
 import com.listen.cache.annotation.cacheroperation.CacheRemoverOperation;
 import com.listen.cache.annotation.cacheroperation.CacherOperation;
 
@@ -38,7 +39,7 @@ public class CacherAnnotationParser implements Serializable {
 		return null;
 	}
 
-	public Collection<CacheOperation> parseCacheAnnotations(Method method) {
+	public Collection<AbstractCacheOperation> parseCacheAnnotations(Method method) {
 		// TODO Auto-generated method stub
 		return parseCacherAnnotations(method);
 	}
@@ -50,9 +51,9 @@ public class CacherAnnotationParser implements Serializable {
 	// return co;
 	// }
 
-	protected Collection<CacheOperation> parseCacherAnnotations(
+	protected Collection<AbstractCacheOperation> parseCacherAnnotations(
 			AnnotatedElement ae) {
-		Collection<CacheOperation> ops = new ArrayList<CacheOperation>(1);
+		Collection<AbstractCacheOperation> ops = new ArrayList<AbstractCacheOperation>(1);
 
 		Collection<Cacher> cachers = AnnotatedElementUtils
 				.getAllMergedAnnotations(ae, Cacher.class);

@@ -24,13 +24,12 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.springframework.cache.annotation.CacheAnnotationParser;
-import org.springframework.cache.interceptor.AbstractFallbackCacheOperationSource;
 import org.springframework.cache.interceptor.CacheOperation;
 
-import com.listen.cache.annotation.cacheroperation.CacherOperation;
+import com.listen.cache.annotation.cacheroperation.AbstractCacheOperation;
 
 @SuppressWarnings("serial")
-public class CacherOperationSource extends AbstractFallbackCacheOperationSource implements Serializable {
+public class CacherOperationSource extends AbstractFallbackCacherOperationSource implements Serializable {
 
 	private final boolean publicMethodsOnly;
 
@@ -59,10 +58,10 @@ public class CacherOperationSource extends AbstractFallbackCacheOperationSource 
 	}
 
 	@Override
-	protected Collection<CacheOperation> findCacheOperations(final Method method) {
+	protected Collection<AbstractCacheOperation> findCacheOperations(final Method method) {
 		return determineCacherOperations(new CacherOperationProvider() {
 			@Override
-			public Collection<CacheOperation> getCacherOperations(
+			public Collection<AbstractCacheOperation> getCacherOperations(
 					CacherAnnotationParser parser) {
 				// TODO Auto-generated method stub
 				return parser.parseCacheAnnotations(method);
@@ -71,18 +70,18 @@ public class CacherOperationSource extends AbstractFallbackCacheOperationSource 
 	}
 
 	@Override
-	protected Collection<CacheOperation> findCacheOperations(Class<?> clazz) {
+	protected Collection<AbstractCacheOperation> findCacheOperations(Class<?> clazz) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	protected Collection<CacheOperation> determineCacherOperations(CacherOperationProvider provider) {
-		Collection<CacheOperation> ops = null;
+	protected Collection<AbstractCacheOperation> determineCacherOperations(CacherOperationProvider provider) {
+		Collection<AbstractCacheOperation> ops = null;
 		for (CacherAnnotationParser annotationParser : this.cacherParsers) {
-			Collection<CacheOperation> annOps = provider.getCacherOperations(annotationParser);
+			Collection<AbstractCacheOperation> annOps = provider.getCacherOperations(annotationParser);
 			if (annOps != null) {
 				if (ops == null) {
-					ops = new ArrayList<CacheOperation>();
+					ops = new ArrayList<AbstractCacheOperation>();
 				}
 				ops.addAll(annOps);
 			}
@@ -101,7 +100,7 @@ public class CacherOperationSource extends AbstractFallbackCacheOperationSource 
 		 * @param parser the parser to use
 		 * @return the cache operations, or {@code null} if none found
 		 */
-		Collection<CacheOperation> getCacherOperations(CacherAnnotationParser parser);
+		Collection<AbstractCacheOperation> getCacherOperations(CacherAnnotationParser parser);
 	}
 
 

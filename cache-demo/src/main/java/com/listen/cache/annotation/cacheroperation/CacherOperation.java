@@ -16,27 +16,18 @@
 
 package com.listen.cache.annotation.cacheroperation;
 
-import org.springframework.cache.interceptor.CacheOperation;
 
-public class CacherOperation extends CacheOperation {
-
-	private final String key;
-
+public class CacherOperation extends AbstractCacheOperation {
 
 	public CacherOperation(CacherOperation.Builder b) {
 		super(b);
-		this.key = b.key;
 	}
 
-
-	public String getKey() {
-		return key;
-	}
 	
 	/**
 	 * @since 4.3
 	 */
-	public static class Builder extends CacheOperation.Builder {
+	public static class Builder extends AbstractCacheOperation.Builder {
 		
 		private String key;
 		
@@ -56,6 +47,13 @@ public class CacherOperation extends CacheOperation {
 		public CacherOperation build() {
 			return new CacherOperation(this);
 		}
+	}
+
+
+	@Override
+	public Object operate(CacherOperationContext context) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

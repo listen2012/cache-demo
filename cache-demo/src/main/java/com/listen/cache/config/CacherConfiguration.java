@@ -2,8 +2,6 @@ package com.listen.cache.config;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.cache.annotation.AbstractCachingConfiguration;
-import org.springframework.cache.interceptor.BeanFactoryCacheOperationSourceAdvisor;
-import org.springframework.cache.interceptor.CacheOperationSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Role;
@@ -12,7 +10,9 @@ import org.springframework.core.type.AnnotationMetadata;
 
 import com.listen.cache.annotation.EnableCacher;
 import com.listen.cache.annotation.component.CacherOperationSource;
+import com.listen.cache.annotation.component.ProxyCacheOperationSource;
 import com.listen.cache.aop.CacherInterceptor;
+import com.listen.cache.aop.CacherOperationSourceAdvisor;
 import com.listen.cache.aop.CacherResolver;
 
 @Configuration
@@ -30,10 +30,9 @@ public class CacherConfiguration extends AbstractCachingConfiguration{
 	}
 	
 	@Bean(name = CacherConfiguration.CACHER_BEAN)
-	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-	public BeanFactoryCacheOperationSourceAdvisor cacheAdvisor() {
-		BeanFactoryCacheOperationSourceAdvisor advisor =
-				new BeanFactoryCacheOperationSourceAdvisor();
+	public CacherOperationSourceAdvisor cacheAdvisor() {
+		CacherOperationSourceAdvisor advisor =
+				new CacherOperationSourceAdvisor();
 		advisor.setCacheOperationSource(cacherOperationSource());
 		advisor.setAdvice(cacherInterceptor());
 //		advisor.setOrder(this.enableCaching.<Integer>getNumber("order"));
@@ -41,13 +40,11 @@ public class CacherConfiguration extends AbstractCachingConfiguration{
 	}
 
 	@Bean
-	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-	public CacheOperationSource cacherOperationSource() {
+	public ProxyCacheOperationSource cacherOperationSource() {
 		return new CacherOperationSource();
 	}
 
 	@Bean
-	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 	public CacherInterceptor cacherInterceptor() {
 		CacherInterceptor interceptor = new CacherInterceptor();
 		interceptor.setCacheOperationSources(cacherOperationSource());
