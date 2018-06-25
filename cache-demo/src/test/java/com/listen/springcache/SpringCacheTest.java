@@ -1,5 +1,7 @@
 package com.listen.springcache;
 
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,7 +24,7 @@ public class SpringCacheTest {
 	@Test
 	public void test() {
 		try {
-			String value = putTest.put("put a string", "key_test");
+			List value = putTest.put("put a string", "keyListTest");
 			System.out.println("test get value : ------ " + value.toString());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -39,7 +41,7 @@ public class SpringCacheTest {
 //		System.out.println("key : ------ " + key);
 //		System.out.println("cacheManager : ------ " + manager);
 
-		String value = (String)putTest.put("333", "key_test");
+		List value = (List)putTest.put("333", "keyListTest");
 		System.out.println("check get value : ------ " + value.toString());
 	}
 }

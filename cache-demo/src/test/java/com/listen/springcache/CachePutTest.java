@@ -1,6 +1,9 @@
 package com.listen.springcache;
 
-import org.springframework.cache.annotation.Cacheable;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -8,9 +11,13 @@ import org.springframework.stereotype.Component;
 public class CachePutTest {
 	final static String KEY = "test";
 
-	@Cacheable(cacheNames="test", key = "#a1")
-	public String put(String value, String key) throws Exception {
+	@CachePut(cacheNames="test", key = "#a1")
+	public List put(String value, String key) throws Exception {
 		System.out.println("cache put test ...");
-		return value + 1;
+		List<String> list = new ArrayList<String>();
+		list.add("d");
+		list.add("e");
+		list.add("f");
+		return list;
 	}
 }
