@@ -2,15 +2,20 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.listen</groupId>
-	<artifactId>cache-demo</artifactId>
+	<artifactId>fund-demo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>cache-demo</name>
+	<name>fund-demo</name>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>1.5.9.RELEASE</version>
 	</parent>
+
+	<properties>
+		<java.version>1.8</java.version>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -26,10 +31,14 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-aop</artifactId>
 		</dependency>
-		<!-- <dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis -->
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-redis</artifactId>
-		</dependency> -->
+		</dependency>
+
+		<!-- <dependency> <groupId>org.springframework.data</groupId> <artifactId>spring-data-redis</artifactId> 
+			<version>2.0.8.RELEASE</version> </dependency> -->
 		<!-- <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-actuator</artifactId> 
 			</dependency> spring cloud dependency <dependency> <groupId>org.springframework.cloud</groupId> 
 			<artifactId>spring-cloud-starter-config</artifactId> </dependency> -->
@@ -45,13 +54,14 @@
 				<scope>import</scope>
 			</dependency>
 			<!-- Override Spring Data release train provided by Spring Boot -->
-			<dependency>
+			<!-- <dependency>
 				<groupId>org.springframework.data</groupId>
 				<artifactId>spring-data-releasetrain</artifactId>
 				<version>Fowler-SR2</version>
 				<scope>import</scope>
 				<type>pom</type>
-			</dependency>
+			</dependency> -->
+			
 			<!-- <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-dependencies</artifactId> 
 				<version>1.5.9.RELEASE</version> <type>pom</type> <scope>import</scope> </dependency> -->
 		</dependencies>
