@@ -8,7 +8,7 @@ import com.listen.cache.annotation.Cacher;
 public class CacherPutTest {
 	final static String KEY = "test";
 
-	@Cacher(key = "#p0 +'-'+#p1")
+	@Cacher(key = "#p1")
 	public String put(String value, String key) throws Exception {
 		System.out.println("cache put test ...");
 		return value + 1;

@@ -19,7 +19,7 @@ public class CacherTest {
 	@Test
 	public void test() {
 		try {
-			String value = putTest.put("put a string", "key_test_1");
+			String value = putTest.put("put a string", "keytest");
 			System.out.println("test get value : ------ " + value.toString());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -36,7 +36,7 @@ public class CacherTest {
 //		System.out.println("key : ------ " + key);
 //		System.out.println("cacheManager : ------ " + manager);
 
-		String value = (String)putTest.put("get a string", "key_test_2");
+		String value = (String)putTest.put("get a string", "keytest");
 		System.out.println("check get value : ------ " + value.toString());
 	}
 }

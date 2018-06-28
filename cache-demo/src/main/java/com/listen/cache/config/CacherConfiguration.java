@@ -1,10 +1,8 @@
 package com.listen.cache.config;
 
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.cache.annotation.AbstractCachingConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Role;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
 
@@ -51,12 +49,12 @@ public class CacherConfiguration extends AbstractCachingConfiguration{
 		if (this.cacheResolver != null) {
 			interceptor.setCacherResolver((CacherResolver) this.cacheResolver);
 		}
-		else if (this.cacheManager != null) {
+		if (this.cacheManager != null) {
 			interceptor.setCacheManager(this.cacheManager);
 		}
-		if (this.keyGenerator != null) {
+//		if (this.keyGenerator != null) {
 //			interceptor.setKeyGenerator(this.keyGenerator);
-		}
+//		}
 		if (this.errorHandler != null) {
 			interceptor.setErrorHandler(this.errorHandler);
 		}

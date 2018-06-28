@@ -1,13 +1,11 @@
 package com.listen;
 
 import java.net.UnknownHostException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -15,20 +13,24 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+import com.listen.cache.annotation.EnableCacher;
 
 @Configuration
-// @EnableCacher
-@EnableCaching
+@EnableCacher
+// @EnableCaching
 public class ListenConfig extends CachingConfigurerSupport {
+	
+	@Autowired
+	private RedisTemplate<Object, Object> template;
 
 	@Bean
-	public CacheManager cacheManager(@SuppressWarnings("rawtypes")RedisTemplate redisTemplate) {
+	public CacheManager cacheManager() {
 		// configure and return CacheManager instance
-		// return new com.listen.cache.map.ConcurrentMapCacheManager();
-		return new org.springframework.data.redis.cache.RedisCacheManager(redisTemplate);
+//		 return new com.listen.cache.map.ConcurrentMapCacheManager();
+		return new com.listen.cache.redis.RedisCacheManager(template);
+//		return new com.listen.cache.redis.RedisCacheManager(redisTemplate);
 	}
 
 	/**
@@ -62,14 +64,14 @@ public class ListenConfig extends CachingConfigurerSupport {
 			return config;
 		}
 	}
-	
+
 	@Configuration
 	protected static class RedisConfiguration {
 
 		@Bean
 		public RedisTemplate<Object, Object> redisTemplate(
 				RedisConnectionFactory redisConnectionFactory)
-						throws UnknownHostException {
+				throws UnknownHostException {
 			RedisTemplate<Object, Object> template = new RedisTemplate<Object, Object>();
 			template.setConnectionFactory(redisConnectionFactory);
 			template.setKeySerializer(new StringRedisSerializer());
@@ -80,7 +82,7 @@ public class ListenConfig extends CachingConfigurerSupport {
 		@Bean
 		public StringRedisTemplate stringRedisTemplate(
 				RedisConnectionFactory redisConnectionFactory)
-						throws UnknownHostException {
+				throws UnknownHostException {
 			StringRedisTemplate template = new StringRedisTemplate();
 			template.setConnectionFactory(redisConnectionFactory);
 			return template;

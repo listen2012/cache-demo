@@ -142,10 +142,11 @@ public abstract class AbstractCacheOperation implements BasicOperation {
 				e.printStackTrace();
 				throw new Throwable(e);
 			}
+			refreshCache(context);
 		} else {
 			value = executeWithoutInvoke(context);
 		}
-		executeAfterInvoke(context);
+//		executeAfterInvoke(context);
 		return value;
 	}
 
@@ -155,6 +156,12 @@ public abstract class AbstractCacheOperation implements BasicOperation {
 
 	protected Object executeWithoutInvoke(CacherOperationContext context) {
 		return null;
+	}
+	
+	protected void refreshCache(CacherOperationContext context){
+		context.getCache().put(
+				context.getOperationByClass(CacherOperation.class)
+						.getCodedKey(), context.getValue());
 	}
 
 	protected void executeAfterInvoke(CacherOperationContext context) {}
